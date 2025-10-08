@@ -1,33 +1,59 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
+using System.Collections.Generic;
+/*
+TODO: Abstract part of this class for use on AI characters later.
+TODO: Decide between having this class as "Player" or 
+make another class Player and this one just control Movement 
+for easier readability and better architecture
+*/
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField] private SpriteRenderer playerSprite;
+    public SpriteRenderer PlayerSprite { get { return playerSprite; } }
+    
+    [SerializeField] private PlayerState currentState = PlayerState.Idle;
+
     private InputSystem_Actions playerInput;
     private InputAction move;
     private InputAction jump;
 
     private InputAction run;
-
     private InputAction crouch;
+ 
+    private InputAction dash;
 
     private Animator anim;
     private bool lastInput = false;
-    private bool isJumping = false;
-    [SerializeField] float jumpForce = 230;
 
-    private SpriteRenderer playerSprite;
-    public bool isCrouching = false;
-    public bool isRunning = false;
     private bool grounded = false;
     private Vector2 velocity = Vector2.zero;
+
     [SerializeField]
     [Range(0.05f, 0.3f)]
     public float smoothing = 0.1f;
+
+    [Header("Movement Parameters")]
     [SerializeField]
+    public float jumpForce = 400f;
     public float crouchSpeed = 7.5f;
     public float walkSpeed = 15.0f;
     public float runSpeed = 30.0f;
+    [SerializeField] private bool canMove = true;
+    
+    [SerializeField] private bool isJumping = false;
+    public bool IsJumping { get { return isJumping; } }
+
+    [SerializeField] private bool isCrouching = false;
+    public bool IsCrouching { get { return isCrouching; } }
+
+    [SerializeField] private bool isRunning = false;
+    public bool IsRunning { get { return isRunning; } }
+
+    [SerializeField] private bool isDashing = false;
+    public bool IsDashing { get { return isDashing; } set { isDashing = value; } }
+    
     [SerializeField]
     private LayerMask groundLayer; 
 
@@ -36,17 +62,26 @@ public class PlayerController : MonoBehaviour
 
     public static PlayerController Instance;
     private Rigidbody2D rb;
+    public Rigidbody2D RigidBody { get { return rb; } }
+
+    private HashSet<PowerType> unlockedPowers = new HashSet<PowerType>();
+    private Dictionary<PowerType, IPlayerPower> powerInstances = new Dictionary<PowerType, IPlayerPower>();
 
     void Awake()
     {
         this.anim = GetComponent<Animator>();
         this.playerInput = new InputSystem_Actions();
         this.playerSprite = GetComponent<SpriteRenderer>();
+
+        // Initialize power instances , will make this better later.
+        powerInstances[PowerType.Dash] = new Dash(this);
+
         Instance = this;
     }
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        unlockedPowers.Add(PowerType.Dash); 
     }
     void OnEnable()
     {
@@ -68,6 +103,9 @@ public class PlayerController : MonoBehaviour
         jump.Enable();
         crouch.Enable();
 
+        dash = playerInput.Player.Dash;
+        dash.Enable();
+
     }
     void OnDisable()
     {
@@ -82,9 +120,21 @@ public class PlayerController : MonoBehaviour
         run.Disable();
         jump.Disable();
         crouch.Disable();
+        dash.Disable();
     }
+
+    public void UnlockPower(PowerType power)
+    {
+        unlockedPowers.Add(power);
+    }
+    public bool HasPower(PowerType power)
+    {
+        return unlockedPowers.Contains(power);
+    }
+
     public void Move()
     {
+        if (!canMove || isDashing) return;
         Vector2 _move = move.ReadValue<Vector2>();
 
         float activeSpeed = isRunning ? runSpeed : isCrouching ? crouchSpeed : walkSpeed;  
@@ -104,6 +154,7 @@ public class PlayerController : MonoBehaviour
             lastInput = false;
         }
         anim.SetFloat("Velocity", Mathf.Abs(_move.x));
+
         Vector2 targetVelocity = new Vector2(_move.x * activeSpeed * 10 * Time.fixedDeltaTime,rb.linearVelocity.y);
 
         rb.linearVelocity = Vector2.SmoothDamp(rb.linearVelocity, targetVelocity, ref velocity, smoothing);
@@ -181,6 +232,10 @@ public class PlayerController : MonoBehaviour
         {
             anim.SetBool("Jumping", true);
             isJumping = true;
+        }
+        if (dash.WasPressedThisFrame() && HasPower(PowerType.Dash))
+        {
+            powerInstances[PowerType.Dash].ActivatePower();
         }
 
     }
