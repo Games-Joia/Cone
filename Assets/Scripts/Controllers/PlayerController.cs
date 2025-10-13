@@ -41,7 +41,8 @@ public class PlayerController : MonoBehaviour
     public float walkSpeed = 15.0f;
     public float runSpeed = 30.0f;
     [SerializeField] private bool canMove = true;
-    
+
+    private bool jumpRequested = false;
     [SerializeField] private bool isJumping = false;
     public bool IsJumping { get { return isJumping; } }
 
@@ -81,7 +82,6 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        unlockedPowers.Add(PowerType.Dash); 
     }
     void OnEnable()
     {
@@ -141,8 +141,8 @@ public class PlayerController : MonoBehaviour
 
         if (_move.x < 0)
         {
-            playerSprite.flipX = true;
-            lastInput = true;
+            playerSprite.flipX = false;
+            lastInput = false;
         }
         if (_move.x == 0)
         {
@@ -150,8 +150,8 @@ public class PlayerController : MonoBehaviour
         }
         if (_move.x > 0)
         {
-            playerSprite.flipX = false;
-            lastInput = false;
+            playerSprite.flipX = true;
+            lastInput = true;
         }
         anim.SetFloat("Velocity", Mathf.Abs(_move.x));
 
@@ -161,21 +161,17 @@ public class PlayerController : MonoBehaviour
     }
     public IEnumerator Jump()
     {
-        if (isJumping)
+        if (jumpRequested)
         {
-            crouch.Disable();
-            run.Disable();
+            isJumping = true;
             grounded = false;
             rb.AddForceY(jumpForce);
-            isJumping = false;
+            jumpRequested = false;
             yield return new WaitForSeconds(0.5f);
+            isJumping = false;
             anim.SetBool("Jumping", false);
         }
-        else
-        {
-            crouch.Enable();
-            run.Enable();
-        }
+
     }
 
     public void SetRunning(bool isHeld)
@@ -192,7 +188,6 @@ public class PlayerController : MonoBehaviour
         {
             crouch.Enable();
             jump.Enable();
-
         }
     }
     public void SetCrouching(bool isHeld)
@@ -221,17 +216,20 @@ public class PlayerController : MonoBehaviour
         {
             grounded = true;
             anim.SetBool("Grounded", true);
+            anim.SetBool("Airborne", false);
         }
         else
         {
             grounded = false;
             anim.SetBool("Grounded", false);
+            anim.SetBool("Airborne", true);
         }
 
         if (jump.WasPressedThisFrame() && grounded)
         {
+            Debug.Log("Jump Pressed");
             anim.SetBool("Jumping", true);
-            isJumping = true;
+            jumpRequested = true;
         }
         if (dash.WasPressedThisFrame() && HasPower(PowerType.Dash))
         {
@@ -242,6 +240,10 @@ public class PlayerController : MonoBehaviour
     void FixedUpdate()
     {
         Move();
-        StartCoroutine(Jump());
+        if(jumpRequested)
+        {
+            Debug.Log("Jump Requested");
+            StartCoroutine(Jump());
+        }
     }
 }

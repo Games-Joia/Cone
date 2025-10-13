@@ -16,20 +16,20 @@ public class Dash : IPlayerPower {
 
     public void DeactivatePower() {
     }
-private IEnumerator DashRoutine()
-{
-    if (player.IsDashing) yield break;
-    player.IsDashing = true;
+    private IEnumerator DashRoutine()
+    {
+        if (player.IsDashing) yield break;
+        player.IsDashing = true;
 
-    float direction = player.PlayerSprite.flipX ? -1 : 1;
-    Vector2 dashVector = new Vector2(direction, 0) * dashForce;
+        float direction = player.PlayerSprite.flipX ? -1 : 1;
+        Vector2 dashVector = new Vector2(direction, 0) * dashForce;
 
-    player.RigidBody.linearVelocity = Vector2.zero;
-    player.RigidBody.AddForce(dashVector, ForceMode2D.Impulse);
+        player.RigidBody.linearVelocity = Vector2.zero;
+        player.RigidBody.AddForce(dashVector, ForceMode2D.Impulse);
 
-    yield return new WaitForSeconds(dashDuration);
+        yield return new WaitForSeconds(dashDuration);
 
-    player.RigidBody.linearVelocity = Vector2.zero;
-    player.IsDashing = false;
-}
+        player.RigidBody.linearVelocity = Vector2.zero;
+        player.IsDashing = false;
+    }
 }
