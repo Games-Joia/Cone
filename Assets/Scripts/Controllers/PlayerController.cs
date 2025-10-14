@@ -4,9 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 /*
 TODO: Abstract part of this class for use on AI characters later.
-TODO: Decide between having this class as "Player" or 
-make another class Player and this one just control Movement 
-for easier readability and better architecture
 */
 public class PlayerController : MonoBehaviour
 {
@@ -85,7 +82,7 @@ public class PlayerController : MonoBehaviour
     }
     void OnEnable()
     {
-       
+
         run = playerInput.Player.Run;
         jump = playerInput.Player.Jump;
         crouch = playerInput.Player.Crouch;
@@ -107,6 +104,7 @@ public class PlayerController : MonoBehaviour
         dash.Enable();
 
     }
+
     void OnDisable()
     {
         run.started -= ctx => SetRunning(true);
