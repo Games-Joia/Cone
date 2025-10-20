@@ -4,43 +4,34 @@ using UnityEngine;
 public class Movement : MonoBehaviour
 {
     public Actor actor { set; get; }
-
     private Vector2 velocity = Vector2.zero;
-    private Rigidbody2D rb;
-    private SpriteRenderer sprite;
-    private Animator anim;
 
-    private bool jumpRequested = false;
+    private void Awake() { }
 
-    private void Awake()
+    public void Move(Vector2 input)
     {
-        rb = GetComponent<Rigidbody2D>();
-    }
-
-    public void Move(Vector2 input, bool isRunning, bool isCrouching, bool isDashing)
-    {
-        if (isDashing)
+        if (actor.IsDashing)
             return;
 
         float activeSpeed =
-            isRunning ? actor.runSpeed
-            : isCrouching ? actor.crouchSpeed
+            actor.IsRunning ? actor.runSpeed
+            : actor.IsCrouching ? actor.crouchSpeed
             : actor.walkSpeed;
 
         if (input.x < 0)
-            sprite.flipX = false;
+            actor.actorSprite.flipX = false;
         else if (input.x > 0)
-            sprite.flipX = true;
+            actor.actorSprite.flipX = true;
 
-        anim.SetFloat("Velocity", Mathf.Abs(input.x));
+        actor.Animator.SetFloat("Velocity", Mathf.Abs(input.x));
 
         Vector2 targetVelocity = new Vector2(
             input.x * activeSpeed * 10 * Time.fixedDeltaTime,
-            rb.linearVelocity.y
+            actor.RigidBody.linearVelocity.y
         );
 
-        rb.linearVelocity = Vector2.SmoothDamp(
-            rb.linearVelocity,
+        actor.RigidBody.linearVelocity = Vector2.SmoothDamp(
+            actor.RigidBody.linearVelocity,
             targetVelocity,
             ref velocity,
             actor.smoothing
@@ -49,15 +40,16 @@ public class Movement : MonoBehaviour
 
     public IEnumerator Jump()
     {
-        if (jumpRequested)
+        if (actor.JumpRequested)
         {
+            Debug.Log("JumpingInsideMov");
             actor.IsJumping = true;
             actor.grounded = false;
             actor.RigidBody.AddForceY(actor.jumpForce);
-            jumpRequested = false;
+            actor.JumpRequested = false;
             yield return new WaitForSeconds(0.5f);
             actor.IsJumping = false;
-            anim.SetBool("Jumping", false);
+            actor.Animator.SetBool("Jumping", false);
         }
     }
 }

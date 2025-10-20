@@ -34,5 +34,38 @@ public class Actor : MonoBehaviour
     [Range(0.01f, 0.3f)]
     public float smoothing = 0.05f;
 
+    private bool jumpRequested = false;
+    public bool JumpRequested
+    {
+        get { return jumpRequested; }
+        set { jumpRequested = value; }
+    }
+
+    [SerializeField]
+    private Animator anim;
+    public Animator Animator
+    {
+        get
+        {
+            if (anim == null)
+            {
+                anim = GetComponent<Animator>();
+            }
+            return anim;
+        }
+    }
+    private Rigidbody2D rigidBody;
+    public Rigidbody2D RigidBody
+    {
+        get
+        {
+            if (rigidBody == null)
+            {
+                rigidBody = GetComponent<Rigidbody2D>();
+            }
+            return rigidBody;
+        }
+    }
+
     public bool grounded { get; set; } = false;
 }

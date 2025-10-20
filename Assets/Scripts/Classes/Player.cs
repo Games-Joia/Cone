@@ -29,14 +29,10 @@ public class Player : Actor
     private Transform groundSensorSpawn;
 
     public static Player Instance;
-
-    public Rigidbody2D RigidBody { get; private set; }
-
+    public Vector2 input;
     private HashSet<PowerType> unlockedPowers = new HashSet<PowerType>();
     private Dictionary<PowerType, IPlayerPower> powerInstances =
         new Dictionary<PowerType, IPlayerPower>();
-
-    private bool jumpRequested = true;
 
     void Awake()
     {
@@ -91,30 +87,41 @@ public class Player : Actor
 
     void Update()
     {
+        input = move.ReadValue<Vector2>();
         Collider2D col = Physics2D.OverlapCircle(groundSensorSpawn.position, 0.1f, groundLayer);
 
         if (col != null)
         {
             grounded = true;
-            // anim.SetBool("Grounded", true);
-            // anim.SetBool("Airborne", false);
+            anim.SetBool("Grounded", true);
+            anim.SetBool("Airborne", false);
         }
         else
         {
             grounded = false;
-            // anim.SetBool("Grounded", false);
-            // anim.SetBool("Airborne", true);
+            anim.SetBool("Grounded", false);
+            anim.SetBool("Airborne", true);
         }
 
         if (jump.WasPressedThisFrame() && grounded)
         {
             Debug.Log("Jump Pressed");
-            // anim.SetBool("Jumping", true);
-            jumpRequested = true;
+            anim.SetBool("Jumping", true);
+            JumpRequested = true;
         }
         if (dash.WasPressedThisFrame() && HasPower(PowerType.Dash))
         {
             powerInstances[PowerType.Dash].ActivatePower();
+        }
+    }
+
+    void FixedUpdate()
+    {
+        movement.Move(input);
+
+        if (JumpRequested)
+        {
+            StartCoroutine(movement.Jump());
         }
     }
 
@@ -123,7 +130,7 @@ public class Player : Actor
         if (isHeld && IsCrouching)
             return;
         IsRunning = isHeld;
-        // anim.SetBool("Running", IsRunning);
+        anim.SetBool("Running", IsRunning);
         if (IsRunning)
         {
             crouch.Disable();
@@ -142,7 +149,7 @@ public class Player : Actor
             return;
 
         IsCrouching = isHeld;
-        // anim.SetBool("Crouching", IsCrouching);
+        anim.SetBool("Crouching", IsCrouching);
 
         if (IsCrouching)
         {

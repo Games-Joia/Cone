@@ -3,9 +3,9 @@ using UnityEngine;
 
 public class Dash : IPlayerPower
 {
-    private PlayerController player;
+    private Player player;
 
-    public Dash(PlayerController player)
+    public Dash(Player player)
     {
         this.player = player;
     }
