@@ -1,4 +1,3 @@
-
 public interface IPlayerPower
 {
     void ActivatePower();
