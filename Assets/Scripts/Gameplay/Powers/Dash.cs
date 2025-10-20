@@ -1,24 +1,30 @@
-using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
+using UnityEngine;
 
-public class Dash : IPlayerPower {
+public class Dash : IPlayerPower
+{
     private PlayerController player;
-    public Dash(PlayerController player) { this.player = player; }
+
+    public Dash(PlayerController player)
+    {
+        this.player = player;
+    }
 
     private float dashForce = 20f;
     private float dashDuration = 0.2f;
 
-    public void ActivatePower() {
+    public void ActivatePower()
+    {
         Debug.Log("Dash Activated");
         player.StartCoroutine(DashRoutine());
     }
 
-    public void DeactivatePower() {
-    }
+    public void DeactivatePower() { }
+
     private IEnumerator DashRoutine()
     {
-        if (player.IsDashing) yield break;
+        if (player.IsDashing)
+            yield break;
         player.IsDashing = true;
 
         float direction = player.PlayerSprite.flipX ? -1 : 1;
