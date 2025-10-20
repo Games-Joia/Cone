@@ -2,9 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
 using System.Collections.Generic;
-/*
-TODO: Abstract part of this class for use on AI characters later.
-*/
+
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private SpriteRenderer playerSprite;
