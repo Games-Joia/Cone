@@ -8,6 +8,14 @@ public class Movement : MonoBehaviour
 
     private void Awake() { }
 
+    private void Start()
+    {
+        if (actor == null)
+        {
+            actor = GetComponent<Actor>();
+        }
+    }   
+
     public void Move(Vector2 input)
     {
         if (actor.IsDashing)
