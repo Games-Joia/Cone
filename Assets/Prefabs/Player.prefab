@@ -10,13 +10,14 @@ GameObject:
   m_Component:
   - component: {fileID: 5532697127023119257}
   - component: {fileID: 1279282554072193722}
+  - component: {fileID: 1560814280136271195}
   - component: {fileID: 8548525364903767689}
   - component: {fileID: 1599489672425277719}
   - component: {fileID: 1703433252542156511}
   - component: {fileID: 2222134691068653894}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -95,6 +96,38 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1560814280136271195
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 321430055523425402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 156bcb6afba49d54ba4e1dece71f081a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player
+  stress: 0
+  <movement>k__BackingField: {fileID: 8548525364903767689}
+  <actorSprite>k__BackingField: {fileID: 1279282554072193722}
+  <IsJumping>k__BackingField: 0
+  <IsCrouching>k__BackingField: 0
+  <IsRunning>k__BackingField: 0
+  <IsDashing>k__BackingField: 0
+  jumpForce: 400
+  crouchSpeed: 7.5
+  walkSpeed: 15
+  runSpeed: 30
+  smoothing: 0.05
+  anim: {fileID: 2222134691068653894}
+  <PlayerSprite>k__BackingField: {fileID: 1279282554072193722}
+  currentState: 0
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  groundSensorSpawn: {fileID: 4580336165601356748}
+  input: {x: 0, y: 0}
 --- !u!114 &8548525364903767689
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -104,25 +137,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 321430055523425402}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a576b8fc038e45f49be6ba1778f4e940, type: 3}
+  m_Script: {fileID: 11500000, guid: 8d4884bfa4a192c45b7683c37cfcdece, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerSprite: {fileID: 0}
-  currentState: 0
-  smoothing: 0.1
-  jumpForce: 400
-  crouchSpeed: 7.5
-  walkSpeed: 15
-  runSpeed: 30
-  canMove: 1
-  isJumping: 0
-  isCrouching: 0
-  isRunning: 0
-  isDashing: 0
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 8
-  groundSensorSpawn: {fileID: 4580336165601356748}
 --- !u!50 &1599489672425277719
 Rigidbody2D:
   serializedVersion: 5

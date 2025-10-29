@@ -9,6 +9,9 @@ public abstract class BaseAI : MonoBehaviour
     [SerializeField]
     protected List<Transform> patrolPoints;
 
+    [SerializeField]
+    protected bool pingPong = false;
+    protected float arriveDistance = 0.1f;
     protected int currentPointIndex = 0;
 
     protected virtual void Start()
@@ -25,22 +28,26 @@ public abstract class BaseAI : MonoBehaviour
 
     protected virtual void Update()
     {
-        if (!CustomMovement() && patrolPoints != null && patrolPoints.Count > 0)
+        bool handled = CustomMovement();
+        Debug.Log($"Handled: {handled}");
+        if (!handled && patrolPoints != null && patrolPoints.Count > 0)
         {
             FollowPatrolPoints();
         }
-
-        CustomMovement();
     }
 
     private void FollowPatrolPoints()
     {
         Transform targetPoint = patrolPoints[currentPointIndex];
         Vector2 direction = (targetPoint.position - actor.transform.position).normalized;
-        actor.movement.Move(direction);
+        Debug.Log($"Patrolling towards point {currentPointIndex} at {targetPoint.position}");
+        Debug.Log($"Direction: {direction}");
+        Debug.Log($"Actor: {actor}");
+        Debug.Log($"Actor Movement: {actor.Movement}");
+        actor.Movement.Move(direction);
 
-
-        if (Vector2.Distance(actor.transform.position, targetPoint.position) < 0.1f)
+        float arriveSqr = arriveDistance * arriveDistance;
+        if (Vector2.SqrMagnitude(targetPoint.position - actor.transform.position) < arriveSqr)
         {
             currentPointIndex = (currentPointIndex + 1) % patrolPoints.Count;
         }

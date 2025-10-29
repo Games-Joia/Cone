@@ -7,8 +7,6 @@ public class Player : Actor
     [field: SerializeField]
     public SpriteRenderer PlayerSprite { get; private set; }
 
-    private Animator anim;
-
     [SerializeField]
     private PlayerState currentState = PlayerState.Idle;
 
@@ -34,15 +32,21 @@ public class Player : Actor
     private Dictionary<PowerType, IPlayerPower> powerInstances =
         new Dictionary<PowerType, IPlayerPower>();
 
+    private Vector2 originalColliderSize;
+    private Vector2 originalColliderOffset;
     void Awake()
     {
-        this.anim = GetComponent<Animator>();
         this.playerInput = new InputSystem_Actions();
         actorSprite = GetComponent<SpriteRenderer>();
-        movement = GetComponent<Movement>();
-        movement.actor = this;
+        Movement = GetComponent<Movement>();
+        Movement.actor = this;
 
-        powerInstances[PowerType.Dash] = new Dash(this);
+        if (ActorCollider is BoxCollider2D box)
+        {
+            originalColliderSize = box.size;
+            originalColliderOffset = box.offset;
+        }
+
         Instance = this;
     }
 
@@ -93,20 +97,20 @@ public class Player : Actor
         if (col != null)
         {
             grounded = true;
-            anim.SetBool("Grounded", true);
-            anim.SetBool("Airborne", false);
+            Animator.SetBool("Grounded", true);
+            Animator.SetBool("Airborne", false);
         }
         else
         {
             grounded = false;
-            anim.SetBool("Grounded", false);
-            anim.SetBool("Airborne", true);
+            Animator.SetBool("Grounded", false);
+            Animator.SetBool("Airborne", true);
         }
 
         if (jump.WasPressedThisFrame() && grounded)
         {
             Debug.Log("Jump Pressed");
-            anim.SetBool("Jumping", true);
+            Animator.SetBool("Jumping", true);
             JumpRequested = true;
         }
         if (dash.WasPressedThisFrame() && HasPower(PowerType.Dash))
@@ -117,11 +121,11 @@ public class Player : Actor
 
     void FixedUpdate()
     {
-        movement.Move(input);
+        Movement.Move(input);
 
         if (JumpRequested)
         {
-            StartCoroutine(movement.Jump());
+            StartCoroutine(Movement.Jump());
         }
     }
 
@@ -130,7 +134,7 @@ public class Player : Actor
         if (isHeld && IsCrouching)
             return;
         IsRunning = isHeld;
-        anim.SetBool("Running", IsRunning);
+        Animator.SetBool("Running", IsRunning);
         if (IsRunning)
         {
             crouch.Disable();
@@ -148,9 +152,39 @@ public class Player : Actor
         if (isHeld && IsRunning)
             return;
 
+        if (!isHeld && IsCrouching)
+        {
+            if (!CanStand())
+            {
+                Debug.Log("Cannot stand up, something is overhead!");
+                return;
+            }
+        }
         IsCrouching = isHeld;
-        anim.SetBool("Crouching", IsCrouching);
+        Animator.SetBool("Crouching", IsCrouching);
+        if (IsCrouching)
+        {
+            Vector2 newSize = originalColliderSize;
+            newSize.y = originalColliderSize.y * 0.5f;
 
+            float delta = originalColliderSize.y - newSize.y;
+            float newOffsetY = originalColliderOffset.y - (delta * 0.5f);
+
+            if (ActorCollider is BoxCollider2D box)
+            {
+                box.size = newSize;
+                box.offset = new Vector2(originalColliderOffset.x, newOffsetY);
+            }
+        }
+
+        else
+        {
+            if (ActorCollider is BoxCollider2D box)
+            {
+                box.size = originalColliderSize;
+                box.offset = originalColliderOffset;
+            }
+        }
         if (IsCrouching)
         {
             run.Disable();
@@ -171,5 +205,36 @@ public class Player : Actor
     public bool HasPower(PowerType power)
     {
         return unlockedPowers.Contains(power);
+    }
+    private bool CanStand()
+    {
+        if (!(ActorCollider is BoxCollider2D box)) return true;
+
+        int rayCount = Mathf.Clamp(Mathf.CeilToInt(2f), 3, 12);
+        float step = 2f;
+        for (int i = 0; i < rayCount; i++)
+        {
+            float x = 2 + i * step;
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.up, originalColliderSize.y - box.size.y, groundLayer);
+            if (hit.collider == null) continue;
+            if (hit.collider.isTrigger) continue;
+            if (hit.collider == ActorCollider) continue;
+            if (hit.transform == transform || hit.transform.IsChildOf(transform)) continue;
+
+            Debug.Log($"CanStand blocked by: {hit.collider.name} at ray x={x}");
+            return false;
+        }
+        return true;
+    }
+    public override void Death()
+    {
+        if (Stress > 100)
+        {
+            
+        }
+        if (Stress >= 110)
+        {
+            Debug.Log("Player has died due to stress!");
+        }
     }
 }

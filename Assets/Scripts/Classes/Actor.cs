@@ -1,26 +1,50 @@
 using UnityEngine;
 
-public class Actor : MonoBehaviour
+public abstract class Actor : MonoBehaviour
 {
     [SerializeField]
     private int stress;
+    public int Stress
+    {
+        get { return stress; }
+        set { stress = Mathf.Max(0, value); }
+    }
+    [SerializeField]
+    private int damage;
+    public int Damage
+    {
+        get { return damage; }
+        set { damage = Mathf.Max(0, value); }
+    }
 
-    [field: SerializeField]
-    public Movement movement { get; set; }
+    [SerializeField]
+    private Movement _movement;
+    public Movement Movement
+    {
+        get
+        {
+            if (_movement == null)
+            {
+                _movement = GetComponent<Movement>();
+            }
+            return _movement;
+        }
+        set => _movement = value;
+    }
 
-    [field: SerializeField]
+    [SerializeField]
     public SpriteRenderer actorSprite { get; set; }
 
-    [field: SerializeField]
+    [SerializeField]
     public bool IsJumping { get; set; } = false;
 
-    [field: SerializeField]
+    [SerializeField]
     public bool IsCrouching { get; set; } = false;
 
-    [field: SerializeField]
+    [SerializeField]
     public bool IsRunning { get; set; } = false;
 
-    [field: SerializeField]
+    [SerializeField]
     public bool IsDashing { get; set; } = false;
 
     [Header("Movement Parameters")]
@@ -66,6 +90,13 @@ public class Actor : MonoBehaviour
             return rigidBody;
         }
     }
-
+    public Collider2D ActorCollider
+    {
+        get
+        {
+            return GetComponent<Collider2D>();
+        }
+    }
     public bool grounded { get; set; } = false;
+    public abstract void Death();
 }

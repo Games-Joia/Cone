@@ -27,9 +27,9 @@ public class Movement : MonoBehaviour
             : actor.walkSpeed;
 
         if (input.x < 0)
-            actor.actorSprite.flipX = false;
-        else if (input.x > 0)
             actor.actorSprite.flipX = true;
+        else if (input.x > 0)
+            actor.actorSprite.flipX = false;
 
         actor.Animator.SetFloat("Velocity", Mathf.Abs(input.x));
 

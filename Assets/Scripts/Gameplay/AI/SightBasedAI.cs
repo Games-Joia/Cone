@@ -15,7 +15,7 @@ public class SightBasedAI : BaseAI
             {
                 Vector2 directionToPlayer = (hit.transform.position - actor.transform.position).normalized;
                 Debug.Log(actor);
-                actor.movement.Move(directionToPlayer);
+                actor.Movement.Move(directionToPlayer);
                 return true;
             }
         }
