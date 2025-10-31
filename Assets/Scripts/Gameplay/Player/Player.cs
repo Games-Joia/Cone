@@ -51,7 +51,6 @@ public class Player : Actor
     private float hiddenAlpha = 0.18f;
 
     private Coroutine hideCoroutine = null;
-    // colliders we temporarily ignored while hidden
     private List<Collider2D> ignoredByAI = new List<Collider2D>();
 
     private Vector2 originalColliderSize;
@@ -85,7 +84,6 @@ public class Player : Actor
         crouch.canceled += ctx => SetCrouching(false);
 
     move = playerInput.Player.Move;
-    // subscribe to both started and performed so keyboard W/Up reliably triggers the toggle
     move.started += OnMoveStarted;
     move.performed += OnMoveStarted;
     move.Enable();
@@ -144,7 +142,6 @@ public class Player : Actor
         {
             powerInstances[PowerType.Dash].ActivatePower();
         }
-        // Direct keyboard fallback: check W or Up arrow press to toggle hide immediately
         var kb = UnityEngine.InputSystem.Keyboard.current;
         if (kb != null && IsInHideZone)
         {
@@ -204,7 +201,6 @@ public class Player : Actor
         if (IsHidden) return;
         IsHidden = true;
         SetCrouching(true);
-        // disable physical collisions with AI so enemies won't push or block the hidden player
         TryIgnoreAICollisions(true);
         if (hideCoroutine != null) StopCoroutine(hideCoroutine);
         hideCoroutine = StartCoroutine(FadeSpriteTo(hiddenAlpha, hideFadeDuration));

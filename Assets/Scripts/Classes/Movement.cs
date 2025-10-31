@@ -37,6 +37,7 @@ public class Movement : MonoBehaviour
         if (actor.IsDashing)
             return;
 
+        // This does not work i hate it 
         if (actor.IsHanging)
         {
             var _rb = actor.RigidBody;
@@ -44,6 +45,7 @@ public class Movement : MonoBehaviour
             return;
         }
 
+        // This does not work i hate it 
         if (actor.IsWallGrabbing)
         {
             var _rb = actor.RigidBody;
@@ -54,7 +56,6 @@ public class Movement : MonoBehaviour
             var v = _rb.linearVelocity;
             float slideSpeed = -2f;
             v.x = 0f;
-            // allow gentle slide down: ensure we take the more negative (downwards) value
             v.y = Mathf.Min(v.y, slideSpeed);
             _rb.linearVelocity = v;
             return;
@@ -77,20 +78,17 @@ public class Movement : MonoBehaviour
             : actor.IsCrouching ? actor.crouchSpeed
             : actor.walkSpeed;
 
-        // sprite flip
         if (actor.actorSprite != null)
         {
             if (input.x < 0) actor.actorSprite.flipX = true;
             else if (input.x > 0) actor.actorSprite.flipX = false;
         }
 
-        // animator (optional)
         if (actor.Animator != null)
         {
             actor.Animator.SetFloat("Velocity", Mathf.Abs(input.x));
         }
 
-        // finally, apply velocity via Rigidbody (must be present)
         var rb = actor.RigidBody;
         if (rb == null)
         {

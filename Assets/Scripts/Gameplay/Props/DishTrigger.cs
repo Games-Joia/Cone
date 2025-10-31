@@ -105,7 +105,6 @@ public class DishTrigger : MonoBehaviour
 			yield break;
 		}
 
-		// If a break collider was provided on this trigger, assign it to the spawned dish so it will break on contact
 		if (breakColliderForSpawnedDish != null)
 		{
 			dishThrow.breakCollider = breakColliderForSpawnedDish;
@@ -115,7 +114,6 @@ public class DishTrigger : MonoBehaviour
 			dishThrow.breakCollider = myCollider;
 		}
 
-		// compute launch direction
 		Vector2 dir;
 		if (launchTowardsEnterer && enterer != null)
 		{
@@ -140,7 +138,6 @@ public class DishTrigger : MonoBehaviour
 			yield break;
 		}
 
-		// If a break collider was provided on this trigger, assign it to the existing dish so it will break on contact
 		if (breakColliderForSpawnedDish != null)
 		{
 			existingDish.breakCollider = breakColliderForSpawnedDish;
@@ -161,7 +158,6 @@ public class DishTrigger : MonoBehaviour
 		existingDish.Launch(dir);
 	}
 
-	// Editor helper to ensure there's a collider when this is used as a break zone
 	void Reset()
 	{
 		myCollider = GetComponent<Collider2D>();
