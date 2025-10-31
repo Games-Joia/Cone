@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5532697127023119257}
   - component: {fileID: 1279282554072193722}
+  - component: {fileID: 4239614949247566944}
   - component: {fileID: 1560814280136271195}
   - component: {fileID: 8548525364903767689}
   - component: {fileID: 1599489672425277719}
@@ -85,7 +86,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -944697715413353565, guid: 9c2b2ea40f702ed43b99b9de616d18d8, type: 3}
+  m_Sprite: {fileID: 2818389117608044160, guid: 78be75721daac6047a358f1ba173984b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -96,6 +97,30 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &4239614949247566944
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 321430055523425402}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 039b8979a09264c4fa9f0765badd111c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WallLedgeController
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  wallCheckDistance: 0.8
+  grabHoldTime: 0.25
+  releaseCooldown: 0.2
+  wallJumpHorizontal: 200
+  wallJumpVertical: 350
+  hangOffset: {x: 0.4, y: -0.3}
+  climbHoldTime: 0.25
+  climbDuration: 0.18
+  climbOffsetY: 0.6
 --- !u!114 &1560814280136271195
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -109,12 +134,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
   stress: 0
-  <movement>k__BackingField: {fileID: 8548525364903767689}
-  <actorSprite>k__BackingField: {fileID: 1279282554072193722}
-  <IsJumping>k__BackingField: 0
-  <IsCrouching>k__BackingField: 0
-  <IsRunning>k__BackingField: 0
-  <IsDashing>k__BackingField: 0
+  damage: 0
+  _movement: {fileID: 8548525364903767689}
   jumpForce: 400
   crouchSpeed: 7.5
   walkSpeed: 15
@@ -140,6 +161,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d4884bfa4a192c45b7683c37cfcdece, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  wallCheckDistance: -1.56
 --- !u!50 &1599489672425277719
 Rigidbody2D:
   serializedVersion: 5
@@ -205,7 +230,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.168, y: 1.472}
+    oldSize: {x: 1, y: 1.4666667}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0

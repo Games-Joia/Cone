@@ -47,6 +47,15 @@ public abstract class Actor : MonoBehaviour
     [SerializeField]
     public bool IsDashing { get; set; } = false;
 
+    [SerializeField]
+    public bool IsWallGrabbing { get; set; } = false;
+
+    [SerializeField]
+    public bool IsHanging { get; set; } = false;
+
+    [SerializeField]
+    public bool IsHidden { get; set; } = false;
+
     [Header("Movement Parameters")]
     [SerializeField]
     public float jumpForce = 400f;
@@ -98,5 +107,6 @@ public abstract class Actor : MonoBehaviour
         }
     }
     public bool grounded { get; set; } = false;
+
     public abstract void Death();
 }
