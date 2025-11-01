@@ -948,7 +948,7 @@ CompositeCollider2D:
     serializedVersion: 2
     m_Bits: 4294967295
   m_IsTrigger: 0
-  m_UsedByEffector: 0
+  m_UsedByEffector: 1
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
@@ -2041,6 +2041,25 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!251 &341983815
+PlatformEffector2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 341983807}
+  m_Enabled: 1
+  m_UseColliderMask: 1
+  m_ColliderMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RotationalOffset: 0
+  m_UseOneWay: 1
+  m_UseOneWayGrouping: 0
+  m_SurfaceArc: 180
+  m_UseSideFriction: 0
+  m_UseSideBounce: 0
+  m_SideArc: 1
 --- !u!1 &405832069
 GameObject:
   m_ObjectHideFlags: 0
@@ -16687,6 +16706,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7190798500465409734, guid: 791900d7ce7eb2b40918059018b46fa8, type: 3}
       insertIndex: -1
       addedObject: {fileID: 341983812}
+    - targetCorrespondingSourceObject: {fileID: 7190798500465409734, guid: 791900d7ce7eb2b40918059018b46fa8, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 341983815}
   m_SourcePrefab: {fileID: 100100000, guid: 791900d7ce7eb2b40918059018b46fa8, type: 3}
 --- !u!1 &952522810
 GameObject:
@@ -50384,6 +50406,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 945019548600324672, guid: 1947b225b7716cb4e951e9644fbc1b2c, type: 3}
+      propertyPath: m_SortingOrder
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 1131696294759764273, guid: 1947b225b7716cb4e951e9644fbc1b2c, type: 3}
       propertyPath: m_Controller
       value: 
@@ -50424,6 +50450,10 @@ PrefabInstance:
     - target: {fileID: 465641747877168323, guid: 891b1cb08bed14e4ba2f5ab4f90c7cb6, type: 3}
       propertyPath: m_Name
       value: Brocolis
+      objectReference: {fileID: 0}
+    - target: {fileID: 1582911890093032987, guid: 891b1cb08bed14e4ba2f5ab4f90c7cb6, type: 3}
+      propertyPath: m_SortingOrder
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2769570200464098483, guid: 891b1cb08bed14e4ba2f5ab4f90c7cb6, type: 3}
       propertyPath: pingPong
