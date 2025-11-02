@@ -21,12 +21,7 @@ public class SightBasedAI : BaseAI
 
             float dx = hit.transform.position.x - actor.transform.position.x;
             Vector2 axisInput = new Vector2(Mathf.Sign(dx), 0f);
-            var mover = cachedMovement != null ? cachedMovement : (actor != null ? actor.Movement : null);
-            if (mover == null)
-            {
-                return false;
-            }
-            mover.Move(axisInput);
+            RequestMove(axisInput);
             float evalVelocity = 0f;
             if (rb2d != null)
                 evalVelocity = Mathf.Abs(rb2d.linearVelocity.x);

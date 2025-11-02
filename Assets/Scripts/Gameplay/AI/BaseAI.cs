@@ -31,6 +31,18 @@ public abstract class BaseAI : MonoBehaviour
     protected float fallbackSpeed = 2f;
     private Vector2 pendingMove = Vector2.zero;
     private bool hasPendingMove = false;
+    
+    /// <summary>
+    /// Request a movement direction for this AI. Movement requests are queued and applied in FixedUpdate
+    /// which ensures proper physics behavior for Rigidbody2D-driven actors. Subclasses should call this
+    /// instead of directly calling Movement.Move when making AI-driven moves.
+    /// </summary>
+    /// <param name="direction">Normalized direction vector (use Mathf.Sign for X)</param>
+    protected void RequestMove(Vector2 direction)
+    {
+        pendingMove = direction;
+        hasPendingMove = true;
+    }
     [Header("AI Bounds")]
     [Tooltip("Optional area (Collider2D) the AI is allowed to walk inside. Leave null for no restriction.")]
     [SerializeField]
