@@ -18,6 +18,10 @@ public class EnemyCollision : MonoBehaviour
     [Tooltip("Stress at which enemy is guaranteed to die")]
     public float guaranteedDeathAt = 110f;
 
+    [Header("VFX")]
+    [Tooltip("Optional particle prefab to spawn when this enemy dies (assign a ParticleSystem prefab).")]
+    public GameObject deathEffect;
+
     private float stress = 0f;
     private Actor actor;
 
@@ -84,6 +88,34 @@ public class EnemyCollision : MonoBehaviour
     private void Die()
     {
         Debug.Log($"{name}: Enemy died from stress.");
+        if (deathEffect != null)
+        {
+            var inst = Instantiate(deathEffect, transform.position, Quaternion.identity);
+            var ps = inst.GetComponent<ParticleSystem>();
+            if (ps == null)
+            {
+                ps = inst.GetComponentInChildren<ParticleSystem>();
+            }
+            if (ps != null)
+            {
+                float lifetime = 0f;
+                try
+                {
+                    var main = ps.main;
+                    lifetime = main.duration;
+                    lifetime += Mathf.Max(0.1f, main.startLifetime.constantMax);
+                }
+                catch
+                {
+                    lifetime = 2f;
+                }
+                Destroy(inst, lifetime + 0.25f);
+            }
+            else
+            {
+                Destroy(inst, 5f);
+            }
+        }
         if (actor != null)
         {
             actor.Death();

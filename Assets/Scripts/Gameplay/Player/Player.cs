@@ -55,6 +55,9 @@ public class Player : Actor
 
     private Vector2 originalColliderSize;
     private Vector2 originalColliderOffset;
+
+    private List<Collectible> collectibles = new List<Collectible>();
+    public List<Collectible> Collectibles => collectibles;
     void Awake()
     {
         this.playerInput = new InputSystem_Actions();
@@ -268,11 +271,11 @@ public class Player : Actor
     {
         if (actorSprite == null) yield break;
         Color start = actorSprite.color;
-        float t = 0f;
-        while (t < duration)
+        float time = 0f;
+        while (time < duration)
         {
-            t += Time.deltaTime;
-            float a = Mathf.Lerp(start.a, targetAlpha, t / duration);
+            time += Time.deltaTime;
+            float a = Mathf.Lerp(start.a, targetAlpha, time / duration);
             actorSprite.color = new Color(start.r, start.g, start.b, a);
             yield return null;
         }
@@ -360,6 +363,23 @@ public class Player : Actor
     {
         Stress += Mathf.RoundToInt(amount);
         Debug.Log($"Player: AddStress({amount}) -> Stress={Stress}");
+        if (actorSprite == null) actorSprite = GetComponent<SpriteRenderer>();
+        if (actorSprite != null)
+        {
+            float redIntensity = Mathf.Clamp01(Stress / 100f);
+            Color baseColor = new Color(1f, 1f - redIntensity, 1f - redIntensity);
+            actorSprite.color = baseColor;
+            if (waveActive && waveMaterialInstance != null)
+            {
+                waveMaterialInstance.SetColor("_Color", baseColor);
+            }
+        }
+
+        if (actorSprite != null)
+        {
+            if (flashRoutine != null) StopCoroutine(flashRoutine);
+            flashRoutine = StartCoroutine(HitFlashCoroutine());
+        }
 
         if (Stress >= 110)
         {
@@ -377,6 +397,53 @@ public class Player : Actor
                 Death();
             }
         }
+    }
+
+    private IEnumerator HitFlashCoroutine()
+    {
+        if (actorSprite == null) yield break;
+
+        // Determine base color (prefer shader material color if wave active)
+        Color baseColor = actorSprite.color;
+        if (waveActive && waveMaterialInstance != null)
+        {
+            try { baseColor = waveMaterialInstance.GetColor("_Color"); } catch { baseColor = actorSprite.color; }
+        }
+
+        // Apply flash color immediately to sprite and shader
+        actorSprite.color = hitFlashColor;
+        if (waveActive && waveMaterialInstance != null)
+        {
+            waveMaterialInstance.SetColor("_Color", hitFlashColor);
+        }
+
+        float elapsed = 0f;
+        while (elapsed < hitFlashDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / hitFlashDuration);
+            Color c = Color.Lerp(hitFlashColor, baseColor, t);
+            if (actorSprite != null)
+            {
+                actorSprite.color = c;
+            }
+            if (waveActive && waveMaterialInstance != null)
+            {
+                waveMaterialInstance.SetColor("_Color", c);
+            }
+            yield return null;
+        }
+
+        if (actorSprite != null)
+        {
+            actorSprite.color = baseColor;
+        }
+        if (waveActive && waveMaterialInstance != null)
+        {
+            waveMaterialInstance.SetColor("_Color", baseColor);
+        }
+
+        flashRoutine = null;
     }
     private bool CanStand()
     {
@@ -398,17 +465,112 @@ public class Player : Actor
         }
         return true;
     }
+    public void AddCollectible(Collectible collectible)
+    {
+        collectibles.Add(collectible);
+        Debug.Log($"Player: Collected {collectible.getCollectibleType()}. Total collectibles: {collectibles.Count}");
+    }
     public override void Death()
     {
-        if (Stress > 100)
+        
+        Debug.Log("Player has died!");
+        Destroy(this.gameObject);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    [Header("Hit & Wave Effect")]
+    [Tooltip("Duration of the red flash when taking stress/hit (seconds)")]
+    public float hitFlashDuration = 0.12f;
+    [Tooltip("Color to flash when hit")]
+    public Color hitFlashColor = Color.red;
+
+    [Tooltip("Wave amplitude (units) applied by the wave shader when stress >= wiggle threshold")]
+    public float shaderWaveAmplitude = 0.05f;
+    [Tooltip("Wave frequency (how many waves vertically)")]
+    public float shaderWaveFrequency = 10f;
+    [Tooltip("Wave speed multiplier")]
+    public float shaderWaveSpeed = 2f;
+        [Tooltip("Maximum stress value used to scale the shader effect (e.g. 110)")]
+        public float shaderMaxStress = 110f;
+    [Tooltip("Stress threshold where the shader wave should start (e.g. 100)")]
+    public float waveThreshold = 100f;
+
+    private Coroutine flashRoutine = null;
+    private Material originalMaterial = null;
+    private Material waveMaterialInstance = null;
+    private bool waveActive = false;
+
+    void LateUpdate()
+    {
+            if (Stress > waveThreshold && !waveActive)
         {
-            
+            EnableWaveMaterial();
         }
-        if (Stress >= 110)
+            else if (Stress <= waveThreshold && waveActive)
         {
-            Debug.Log("Player has died due to stress!");
-            Destroy(this.gameObject);
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+            DisableWaveMaterial();
         }
+
+        if (waveActive && waveMaterialInstance != null)
+        {
+            float t = 0f;
+            if (shaderMaxStress > waveThreshold)
+                t = Mathf.Clamp01((Stress - waveThreshold) / (shaderMaxStress - waveThreshold));
+            float amp = Mathf.Lerp(shaderWaveAmplitude * 0.5f, shaderWaveAmplitude * 2f, t);
+            float freq = shaderWaveFrequency;
+            float spd = shaderWaveSpeed;
+            waveMaterialInstance.SetFloat("_Amplitude", amp);
+            waveMaterialInstance.SetFloat("_Frequency", freq);
+            waveMaterialInstance.SetFloat("_Speed", spd);
+        }
+    }
+
+    void EnableWaveMaterial()
+    {
+        if (actorSprite == null) actorSprite = GetComponent<SpriteRenderer>();
+        if (actorSprite == null) return;
+        if (waveActive) return;
+
+        originalMaterial = actorSprite.material;
+
+        Shader s = Shader.Find("Custom/WaveySprite");
+        if (s == null)
+        {
+            Debug.LogWarning("Wavey shader not found (Custom/WaveySprite). Install shader or restart Unity to compile it.");
+            return;
+        }
+
+        waveMaterialInstance = new Material(s);
+
+        if (actorSprite.sprite != null)
+        {
+            waveMaterialInstance.SetTexture("_MainTex", actorSprite.sprite.texture);
+        }
+        waveMaterialInstance.SetColor("_Color", actorSprite.color);
+        waveMaterialInstance.SetFloat("_Amplitude", shaderWaveAmplitude);
+        waveMaterialInstance.SetFloat("_Frequency", shaderWaveFrequency);
+        waveMaterialInstance.SetFloat("_Speed", shaderWaveSpeed);
+
+        actorSprite.material = waveMaterialInstance;
+        waveActive = true;
+    }
+
+    void DisableWaveMaterial()
+    {
+        if (!waveActive) return;
+        if (actorSprite == null) actorSprite = GetComponent<SpriteRenderer>();
+
+        if (actorSprite != null && originalMaterial != null)
+        {
+            actorSprite.material = originalMaterial;
+        }
+
+        if (waveMaterialInstance != null)
+        {
+            Destroy(waveMaterialInstance);
+            waveMaterialInstance = null;
+        }
+        originalMaterial = null;
+        waveActive = false;
     }
 }

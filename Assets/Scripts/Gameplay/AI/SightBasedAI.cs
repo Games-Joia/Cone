@@ -27,7 +27,6 @@ public class SightBasedAI : BaseAI
                 return false;
             }
             mover.Move(axisInput);
-            // update animator velocity and sprite flip to face the player
             float evalVelocity = 0f;
             if (rb2d != null)
                 evalVelocity = Mathf.Abs(rb2d.linearVelocity.x);

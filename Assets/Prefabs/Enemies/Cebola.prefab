@@ -267,3 +267,4 @@ MonoBehaviour:
   playerBounceVelocity: 8
   deathAt: 30
   guaranteedDeathAt: 30
+  deathEffect: {fileID: 3692997422873560928, guid: 0fbf688dc50281a469a0fd90ea899006, type: 3}
