@@ -204,6 +204,7 @@ MonoBehaviour:
   fallbackSpeed: 2
   walkableArea: {fileID: 0}
   sightRange: 10
+  targetTag: Player
 --- !u!61 &4959475383889617722
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -265,5 +266,11 @@ MonoBehaviour:
   stompStress: 30
   collisionStressToPlayer: 15
   playerBounceVelocity: 8
+  stompTolerance: 0.08
+  stompVelocityThreshold: -0.1
+  stompPositionYOffset: 0.1
+  stompNormalThreshold: 0.5
+  stompSideInsetFraction: 0.2
   deathAt: 100
   guaranteedDeathAt: 110
+  deathEffect: {fileID: 0}

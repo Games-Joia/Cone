@@ -40,6 +40,7 @@ public class Player : Actor
     [Header("Hide Settings")]
     [SerializeField]
     [Tooltip("Tag to set on the player while hidden. Create this tag in the Tag manager (default: Hidden). If missing, falls back to Untagged.")]
+    [Tag]
     private string hideTag = "Hidden";
 
     [SerializeField]

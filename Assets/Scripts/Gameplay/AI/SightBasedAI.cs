@@ -4,6 +4,9 @@ public class SightBasedAI : BaseAI
 {
     [SerializeField]
     private float sightRange = 5f;
+    [Tooltip("Optional tag to filter targets. Leave empty to target any Actor.")]
+    [Tag]
+    public string targetTag = "";
 
     protected override bool CustomMovement()
     {
@@ -14,6 +17,7 @@ public class SightBasedAI : BaseAI
         foreach (var hit in hits)
         {
             if (hit == null) continue;
+            if (!string.IsNullOrEmpty(targetTag) && !hit.CompareTag(targetTag)) continue;
             var targetActor = hit.GetComponent<Actor>();
             if (targetActor == null) continue;
             if (targetActor == actor) continue;
