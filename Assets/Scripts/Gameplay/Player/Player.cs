@@ -292,12 +292,10 @@ public class Player : Actor
         if (IsRunning)
         {
             crouch.Disable();
-            jump.Disable();
         }
         else
         {
             crouch.Enable();
-            jump.Enable();
         }
     }
 
